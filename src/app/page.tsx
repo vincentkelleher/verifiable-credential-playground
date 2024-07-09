@@ -90,7 +90,7 @@ export default function Home() {
             <Text mt="md" ta="justify">
               Verifiable credentials are encoded using VC-JWT according to&nbsp;
               <Anchor href="https://www.w3.org/TR/vc-jose-cose/" target="_blank">
-                W3C's Securing Verifiable Credentials using JOSE and COSE
+                W3C&apos;s Securing Verifiable Credentials using JOSE and COSE
               </Anchor>.
             </Text>
           </Paper>
