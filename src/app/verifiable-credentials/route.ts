@@ -15,7 +15,8 @@ export async function POST(request: Request) {
         alg: 'ES256',
         typ: 'vc+ld+json+jwt',
         cty: 'vc+ld+json',
-        kid: didWeb
+        iss: didWeb,
+        kid: didWeb + '#X509-JWK2020'
       })
       .sign(privateKey)
   )
