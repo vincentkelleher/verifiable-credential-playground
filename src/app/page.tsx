@@ -1,6 +1,18 @@
 'use client'
 
-import { Anchor, Button, Container, CopyButton, Group, JsonInput, Paper, SimpleGrid, Text, Title } from '@mantine/core'
+import {
+  Anchor,
+  Button,
+  Checkbox,
+  Container,
+  CopyButton,
+  Group,
+  JsonInput,
+  Paper,
+  SimpleGrid,
+  Text,
+  Title
+} from '@mantine/core'
 import { useForm } from '@mantine/form'
 import React, { useState } from 'react'
 
@@ -10,6 +22,7 @@ export default function Home() {
   const form = useForm({
     mode: 'uncontrolled',
     initialValues: {
+      neverExpires: false,
       document:
         '{\n' +
         '  "@context": [\n' +
@@ -31,8 +44,8 @@ export default function Home() {
     }
   })
 
-  const buildVcJwt = async (document: any) => {
-    let response = await fetch('/verifiable-credentials', {
+  const buildVcJwt = async (document: any, neverExpires: boolean) => {
+    let response = await fetch(`/verifiable-credentials?neverExpires=${neverExpires}`, {
       method: 'POST',
       body: document
     })
@@ -95,7 +108,7 @@ export default function Home() {
             </Text>
           </Paper>
           <Paper shadow="xs" p="xl">
-            <form onSubmit={form.onSubmit((values) => buildVcJwt(values.document))}>
+            <form onSubmit={form.onSubmit((values) => buildVcJwt(values.document, values.neverExpires))}>
               <Title order={3} ta="center">
                 Verifiable Credential Generator
               </Title>
@@ -111,6 +124,16 @@ export default function Home() {
                 key={form.key('document')}
                 {...form.getInputProps('document')}
               />
+              <Group mt="lg">
+                <Checkbox
+                  defaultChecked
+                  label="Never Expires"
+                  description="Doesn't set a validUntil property"
+                  variant="outline"
+                  key={form.key('neverExpires')}
+                  {...form.getInputProps('neverExpires', { type: 'checkbox' })}
+                />
+              </Group>
               <Group mt="lg" justify="right">
                 <Button type="submit" variant="light">
                   Sign
