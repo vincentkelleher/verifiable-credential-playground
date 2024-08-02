@@ -1,11 +1,13 @@
 'use client'
 
 import {
+  ActionIcon,
   Anchor,
   Button,
   Checkbox,
   Container,
   CopyButton,
+  Grid,
   Group,
   JsonInput,
   Paper,
@@ -15,6 +17,26 @@ import {
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import React, { useState } from 'react'
+import { IconTrash } from '@tabler/icons-react'
+
+const defaultDocument =
+  '{\n' +
+  '  "@context": [\n' +
+  '    "https://www.w3.org/ns/credentials/v2",\n' +
+  '    "https://www.w3.org/ns/credentials/examples/v2"\n' +
+  '  ],\n' +
+  '  "id": "http://university.example/credentials/3732",\n' +
+  '  "type": ["VerifiableCredential", "ExampleDegreeCredential"],\n' +
+  '  "issuer": "https://university.example/issuers/565049",\n' +
+  '  "validFrom": "2010-01-01T00:00:00Z",\n' +
+  '  "credentialSubject": {\n' +
+  '    "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",\n' +
+  '    "degree": {\n' +
+  '      "type": "ExampleBachelorDegree",\n' +
+  '      "name": "Bachelor of Science and Arts"\n' +
+  '    }\n' +
+  '  }\n' +
+  '}'
 
 export default function Home() {
   const [vcJwt, setVcJwt] = useState('')
@@ -23,31 +45,14 @@ export default function Home() {
     mode: 'uncontrolled',
     initialValues: {
       neverExpires: false,
-      document:
-        '{\n' +
-        '  "@context": [\n' +
-        '    "https://www.w3.org/ns/credentials/v2",\n' +
-        '    "https://www.w3.org/ns/credentials/examples/v2"\n' +
-        '  ],\n' +
-        '  "id": "http://university.example/credentials/3732",\n' +
-        '  "type": ["VerifiableCredential", "ExampleDegreeCredential"],\n' +
-        '  "issuer": "https://university.example/issuers/565049",\n' +
-        '  "validFrom": "2010-01-01T00:00:00Z",\n' +
-        '  "credentialSubject": {\n' +
-        '    "id": "did:example:ebfeb1f712ebc6f1c276e12ec21",\n' +
-        '    "degree": {\n' +
-        '      "type": "ExampleBachelorDegree",\n' +
-        '      "name": "Bachelor of Science and Arts"\n' +
-        '    }\n' +
-        '  }\n' +
-        '}'
+      documents: [defaultDocument]
     }
   })
 
-  const buildVcJwt = async (document: any, neverExpires: boolean) => {
+  const buildVcJwt = async (documents: any[], neverExpires: boolean) => {
     let response = await fetch(`/verifiable-credentials?neverExpires=${neverExpires}`, {
       method: 'POST',
-      body: document
+      body: JSON.stringify(documents.map((document) => JSON.parse(document)))
     })
 
     setVcJwt(await response.text())
@@ -104,26 +109,45 @@ export default function Home() {
               Verifiable credentials are encoded using VC-JWT according to&nbsp;
               <Anchor href="https://www.w3.org/TR/vc-jose-cose/" target="_blank">
                 W3C&apos;s Securing Verifiable Credentials using JOSE and COSE
-              </Anchor>.
+              </Anchor>
+              .
             </Text>
           </Paper>
           <Paper shadow="xs" p="xl">
-            <form onSubmit={form.onSubmit((values) => buildVcJwt(values.document, values.neverExpires))}>
+            <form onSubmit={form.onSubmit((values) => buildVcJwt(values.documents, values.neverExpires))}>
               <Title order={3} ta="center">
-                Verifiable Credential Generator
+                Verifiable Presentation Generator
               </Title>
-              <JsonInput
-                mt="md"
-                autosize={true}
-                minRows={20}
-                inputSize="400px"
-                label="Document"
-                description="The input document you wish to sign"
-                placeholder="Your document to become a verifiable credential"
-                formatOnBlur
-                key={form.key('document')}
-                {...form.getInputProps('document')}
-              />
+              {form.getValues().documents.map((document, index) => (
+                <Grid key={`document-${index}`} mt="md">
+                  <Grid.Col span={11}>
+                    <JsonInput
+                      autosize={true}
+                      minRows={20}
+                      inputSize="400px"
+                      formatOnBlur
+                      key={form.key(`documents.${index}`)}
+                      {...form.getInputProps(`documents.${index}`)}
+                    />
+                  </Grid.Col>
+                  <Grid.Col span={1}>
+                    <ActionIcon
+                      variant="light"
+                      color="red"
+                      aria-label="Trash"
+                      style={{ height: '100%', width: '100%' }}
+                      onClick={() => form.removeListItem('documents', index)}
+                    >
+                      <IconTrash style={{ width: '40%', height: '40%' }} stroke={1.5} />
+                    </ActionIcon>
+                  </Grid.Col>
+                </Grid>
+              ))}
+              <Group mt="lg" justify="center">
+                <Button variant="light" onClick={() => form.insertListItem('documents', defaultDocument)}>
+                  +
+                </Button>
+              </Group>
               <Group mt="lg">
                 <Checkbox
                   defaultChecked
