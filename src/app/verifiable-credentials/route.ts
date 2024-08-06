@@ -1,29 +1,39 @@
 import { CompactSign, importPKCS8, KeyLike } from 'jose'
 import { DateTime } from 'luxon'
 import { NextRequest } from 'next/server'
+import VerifiableCredential from '@/app/model/verifiable-credential'
+import { VcJwt } from '@/app/model/vc-jwt'
+import VerifiablePresentation from '@/app/model/verifiable-presentation'
+import EnvelopedVerifiableCredential from '@/app/model/enveloped-verifiable-credential'
+import { VpJwt } from '@/app/model/vp-jwt'
 
 export async function POST(request: NextRequest) {
-  const documents = await request.json()
+  const documents: VerifiableCredential[] = await request.json()
   const neverExpires: boolean = request.nextUrl.searchParams.get('neverExpires') === 'true'
 
-  const vcJwts: string[] = await Promise.all(
+  const vcJwts: VcJwt[] = await Promise.all(
     documents.map(async (document: any): Promise<string> => await signDocument(document, neverExpires))
   )
 
-  const vpJwt: any = {
+  const verifiablePresentation: VerifiablePresentation = {
     '@context': ['https://www.w3.org/ns/credentials/v2', 'https://www.w3.org/ns/credentials/examples/v2'],
     type: 'VerifiablePresentation',
-    verifiableCredential: vcJwts.map((vcJwt) => ({
-      '@context': 'https://www.w3.org/ns/credentials/v2',
-      id: `data:application/vc+ld+json+jwt;${vcJwt}`,
-      type: 'EnvelopedVerifiableCredential'
-    }))
+    verifiableCredential: vcJwts.map(
+      (vcJwt: VcJwt): EnvelopedVerifiableCredential => ({
+        '@context': 'https://www.w3.org/ns/credentials/v2',
+        id: `data:application/vc+ld+json+jwt;${vcJwt}`,
+        type: 'EnvelopedVerifiableCredential'
+      })
+    )
   }
 
-  return new Response(await signDocument(vpJwt, neverExpires))
+  return new Response(await signDocument(verifiablePresentation, neverExpires))
 }
 
-async function signDocument(document: any, neverExpires: boolean) {
+async function signDocument(
+  document: VerifiableCredential | VerifiablePresentation,
+  neverExpires: boolean
+): Promise<VcJwt | VpJwt> {
   const didWeb: string = `did:web:${process.env.DOMAIN!}`
   const privateKey: KeyLike = await importPKCS8(process.env.PRIVATE_KEY!, 'ES256')
 
