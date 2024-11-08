@@ -19,6 +19,7 @@ const generate = async () => {
     '.env.local',
     `DOMAIN=my-domain.com
 PRIVATE_KEY="${privateKeyPem.trim()}"
+PRIVATE_KEY_ALGORITHM="ES256"
 PUBLIC_KEY="${publicKeyPem.trim()}"
 CERTIFICATE=""`
   )
@@ -28,7 +29,7 @@ CERTIFICATE=""`
   console.log('\nℹ️ Please run')
   console.log('\n\topenssl req -new -x509 -key private-key.pem -out certificate.pem\n')
   console.log(
-    "Then paste the content (without any line breaks) of certificate.pem as the value of .env.local's CERTIFICATE variable"
+    "Then paste the content of certificate.pem as the value of .env.local's CERTIFICATE variable"
   )
 }
 
