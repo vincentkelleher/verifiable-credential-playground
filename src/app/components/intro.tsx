@@ -19,6 +19,13 @@ export default function Intro() {
           </Anchor>
           .
         </Text>
+        <Text mt="md" ta="center">
+          Decentralized Identity (DID) information can be found at the&nbsp;
+          <Anchor href="/.well-known/did.json" target="_blank">
+            /.well-known/did.json
+          </Anchor>
+          &nbsp;endpoint.
+        </Text>
       </Paper>
     </>
   )

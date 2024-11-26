@@ -36,7 +36,10 @@ const defaultDocument: string =
 export default function Home() {
   const [vcJwt, setVcJwt] = useState('')
   const [importedVcJwt, setImportedVcJwt] = useInputState('')
-  const [opened, { open, close }] = useDisclosure(false)
+  const [importVcJwtOpened, { open: openImportVcJwt, close: closeImportVcJwt }] = useDisclosure(false)
+
+  const [importedVcArray, setImportedVcArray] = useInputState('')
+  const [importVcArrayOpened, { open: openImportVcArray, close: closeImportVcArray }] = useDisclosure(false)
 
   const form = useForm({
     mode: 'uncontrolled',
@@ -65,7 +68,20 @@ export default function Home() {
       }
     }
 
-    close()
+    closeImportVcJwt()
+  }
+
+  const importVcArray = async () => {
+    const verifiableCredentials: VerifiableCredential[] = JSON.parse(importedVcArray)
+
+    form.reset()
+    form.removeListItem('documents', 0)
+
+    for (const verifiableCredential of verifiableCredentials) {
+      form.insertListItem('documents', JSON.stringify(verifiableCredential, null, 2))
+    }
+
+    closeImportVcArray()
   }
 
   const buildVcJwt = async (documents: string[], neverExpires: boolean) => {
@@ -79,7 +95,14 @@ export default function Home() {
 
   return (
     <>
-      <Modal ta="center" opened={opened} onClose={close} title="Import from VC-JWT" size="70%" centered>
+      <Modal
+        ta="center"
+        opened={importVcJwtOpened}
+        onClose={closeImportVcJwt}
+        title="Import from VC-JWT"
+        size="70%"
+        centered
+      >
         <Textarea
           data-autofocus
           placeholder="Enter your VC-JWT here..."
@@ -90,6 +113,28 @@ export default function Home() {
           value={importedVcJwt}
         />
         <Button variant="light" mt="lg" onClick={() => importVcJwt()}>
+          Import
+        </Button>
+      </Modal>
+
+      <Modal
+        ta="center"
+        opened={importVcArrayOpened}
+        onClose={closeImportVcArray}
+        title="Import VC array"
+        size="70%"
+        centered
+      >
+        <Textarea
+          data-autofocus
+          placeholder="Enter your VC array here..."
+          autosize
+          minRows={6}
+          maxRows={10}
+          onChange={setImportedVcArray}
+          value={importedVcArray}
+        />
+        <Button variant="light" mt="lg" onClick={() => importVcArray()}>
           Import
         </Button>
       </Modal>
@@ -105,10 +150,16 @@ export default function Home() {
                 <Title order={3} ta="center" mb="lg">
                   Verifiable Presentation Generator
                 </Title>
-                <Button variant="light" mt="md" mb="md" w="100%" h="50px" onClick={open}>
-                  <IconSparkles />
-                  &nbsp; Import from VC-JWT
-                </Button>
+                <Group justify="center" grow>
+                  <Button variant="light" mt="md" mb="md" h="50px" onClick={openImportVcJwt}>
+                    <IconSparkles />
+                    &nbsp; Import from VC-JWT
+                  </Button>
+                  <Button variant="light" mt="md" mb="md" h="50px" onClick={openImportVcArray}>
+                    <IconSparkles />
+                    &nbsp; Import VC array
+                  </Button>
+                </Group>
                 {form.getValues().documents.map((_: string, index: number) => (
                   <Document key={nanoid()} index={index} form={form} />
                 ))}
