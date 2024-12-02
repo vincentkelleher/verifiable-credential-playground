@@ -102,7 +102,7 @@ linked to the root URL for DID resolving purposes. The frontend container is map
 
 > [!TIP]
 > If you are using Let's Encrypt certificates we suggest you use the private key, public key and certificate in the 
-> backend environment variables.
+> backend environment variables. Let's Encrypt certificates are allowed on the Gaia-X `development` environments.
 > 
 > Also, if you are using `cert-manager` you can use an init container to derive the public key from the certificate's 
 > secret private key to then inject it as a backend environment variable.
