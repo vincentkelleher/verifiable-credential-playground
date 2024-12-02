@@ -38,6 +38,17 @@ When you are finished, you can stop the services with this command:
 docker compose down
 ```
 
+### With Docker Compose (Development)
+
+If you need to run this project for development purposes you can build the services through Docker Compose with the 
+following command:
+
+```bash
+docker compose -f docker-compose.dev.yml up -d --build
+```
+
+To stop the services you can use the last command of [With Docker Compose](#with-docker-compose).
+
 ### With NPM
 
 The frontend can be run with:

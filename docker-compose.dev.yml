@@ -1,13 +1,13 @@
 services:
   frontend:
-    image: ghcr.io/vincentkelleher/verifiable-credential-playground-frontend:latest
+    build: ./frontend
     environment:
       NEXT_PUBLIC_BACKEND_HOST: http://localhost:4000
     ports:
       - 3000:3000
 
   backend:
-    image: ghcr.io/vincentkelleher/verifiable-credential-playground-backend:latest
+    build: ./backend
     ports:
       - 4000:4000
     volumes:
