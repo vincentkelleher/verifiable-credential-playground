@@ -1,0 +1,10 @@
+.env
+certificate.pem
+private-key.pem
+public-key.pem
+
+generate-env.ts
+node_modules
+dist
+.eslintrc.js
+.gitignore
