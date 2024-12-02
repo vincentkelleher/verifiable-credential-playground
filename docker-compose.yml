@@ -1,0 +1,14 @@
+services:
+  frontend:
+    build: ./frontend
+    environment:
+      NEXT_PUBLIC_BACKEND_HOST: http://localhost:4000
+    ports:
+      - 3000:3000
+
+  backend:
+    build: ./backend
+    ports:
+      - 4000:4000
+    volumes:
+      - './backend/.env:/app/.env'

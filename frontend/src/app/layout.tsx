@@ -4,6 +4,7 @@ import '@mantine/core/styles.css'
 import './globals.css'
 
 import { ColorSchemeScript, createTheme, MantineProvider } from '@mantine/core'
+import { PublicEnvScript } from 'next-runtime-env'
 
 export const metadata = {
   title: 'My Mantine app',
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <title>Verifiable Credential Playground</title>
         <ColorSchemeScript />
+        <PublicEnvScript />
       </head>
       <body>
         <MantineProvider theme={theme}>{children}</MantineProvider>

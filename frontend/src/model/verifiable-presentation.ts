@@ -1,5 +1,5 @@
-import VerifiableCredential from '@/app/model/verifiable-credential'
-import EnvelopedVerifiableCredential from '@/app/model/enveloped-verifiable-credential'
+import EnvelopedVerifiableCredential from './enveloped-verifiable-credential'
+import VerifiableCredential from './verifiable-credential'
 
 export default interface VerifiablePresentation {
   '@context': string | string[] | any

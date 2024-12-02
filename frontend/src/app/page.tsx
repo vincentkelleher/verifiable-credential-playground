@@ -10,9 +10,10 @@ import Intro from '@/app/components/intro'
 import { IconSparkles } from '@tabler/icons-react'
 import { useDisclosure, useInputState } from '@mantine/hooks'
 import { decodeJwt } from 'jose'
-import VerifiableCredential from '@/app/model/verifiable-credential'
-import EnvelopedVerifiableCredential from '@/app/model/enveloped-verifiable-credential'
-import { VcJwt } from '@/app/model/vc-jwt'
+import VerifiableCredential from '@/model/verifiable-credential'
+import EnvelopedVerifiableCredential from '@/model/enveloped-verifiable-credential'
+import { VcJwt } from '@/model/vc-jwt'
+import { env } from 'next-runtime-env'
 
 const defaultDocument: string =
   '{\n' +
@@ -85,10 +86,16 @@ export default function Home() {
   }
 
   const buildVcJwt = async (documents: string[], neverExpires: boolean) => {
-    let response = await fetch(`/verifiable-credentials?neverExpires=${neverExpires}`, {
-      method: 'POST',
-      body: JSON.stringify(documents.map((document) => JSON.parse(document)))
-    })
+    let response = await fetch(
+      `${env('NEXT_PUBLIC_BACKEND_HOST') || 'http://localhost:4000'}/verifiable-credentials?neverExpires=${neverExpires}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(documents.map((document) => JSON.parse(document)))
+      }
+    )
 
     setVcJwt(await response.text())
   }
