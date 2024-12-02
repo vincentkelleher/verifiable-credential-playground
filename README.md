@@ -32,9 +32,29 @@ docker compose up -d --build
 This will build and start two containers, one for the frontend and one for the backend.  
 You can now use your very one Verifiable Credential Playground at: [http://localhost:3000/playground](http://localhost:3000/playground).
 
-### With Your Favorite IDE
+When you are finished, you can stop the services with this command:
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+```bash
+docker compose down
+```
+
+### With NPM
+
+The frontend can be run with:
+
+```bash
+cd frontend
+npm run dev
+```
+
+And the backend can be run with:
+
+```bash
+cd backend
+npm run start:dev
+```
+
+You can now use your very one Verifiable Credential Playground at: [http://localhost:3000/playground](http://localhost:3000/playground).
 
 ## Customizing
 
