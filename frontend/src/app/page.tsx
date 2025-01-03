@@ -1,6 +1,19 @@
 'use client'
 
-import { Box, Button, Checkbox, Container, Grid, Group, Modal, Paper, Textarea, Title } from '@mantine/core'
+import {
+  Box,
+  Button,
+  Container,
+  Grid,
+  Group,
+  Modal,
+  NumberInput,
+  Paper,
+  Radio,
+  Select,
+  Textarea,
+  Title
+} from '@mantine/core'
 import { useForm } from '@mantine/form'
 import React, { useState } from 'react'
 import JWT from '@/app/components/jwt'
@@ -14,6 +27,8 @@ import VerifiableCredential from '@/model/verifiable-credential'
 import EnvelopedVerifiableCredential from '@/model/enveloped-verifiable-credential'
 import { VcJwt } from '@/model/vc-jwt'
 import { env } from 'next-runtime-env'
+import { DateTime } from 'luxon'
+import { FormDto, Validity } from '@/dto/form.dto'
 
 const defaultDocument: string =
   '{\n' +
@@ -34,6 +49,15 @@ const defaultDocument: string =
   '  }\n' +
   '}'
 
+const validityUnits: { label: string; value: string }[] = [
+  { label: 'Minutes', value: 'minutes' },
+  { label: 'Hours', value: 'hours' },
+  { label: 'Days', value: 'days' },
+  { label: 'Weeks', value: 'weeks' },
+  { label: 'Months', value: 'months' },
+  { label: 'Years', value: 'years' }
+]
+
 export default function Home() {
   const [vcJwt, setVcJwt] = useState('')
   const [importedVcJwt, setImportedVcJwt] = useInputState('')
@@ -42,10 +66,11 @@ export default function Home() {
   const [importedVcArray, setImportedVcArray] = useInputState('')
   const [importVcArrayOpened, { open: openImportVcArray, close: closeImportVcArray }] = useDisclosure(false)
 
-  const form = useForm({
+  const form = useForm<FormDto>({
     mode: 'uncontrolled',
     initialValues: {
-      neverExpires: false,
+      validity: Validity.DEFAULT,
+      validityUnit: validityUnits[0].value,
       documents: [defaultDocument]
     }
   })
@@ -85,15 +110,28 @@ export default function Home() {
     closeImportVcArray()
   }
 
-  const buildVcJwt = async (documents: string[], neverExpires: boolean) => {
+  const buildVcJwt = async (values: FormDto) => {
+    let parameters: string = ''
+    if (values.validity === Validity.OVERRIDE) {
+      parameters +=
+        'validUntil=' +
+        encodeURIComponent(
+          DateTime.now()
+            .plus({ [values.validityUnit!]: values.validityOffset })
+            .toISO()
+        )
+    } else if (values.validity === Validity.NEVER_EXPIRES) {
+      parameters += `neverExpires=true`
+    }
+
     let response = await fetch(
-      `${env('NEXT_PUBLIC_BACKEND_HOST') || 'http://localhost:4000'}/verifiable-credentials?neverExpires=${neverExpires}`,
+      `${env('NEXT_PUBLIC_BACKEND_HOST') || 'http://localhost:4000'}/verifiable-credentials?${parameters}`,
       {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(documents.map((document) => JSON.parse(document)))
+        body: JSON.stringify(values.documents.map((document: string) => JSON.parse(document)))
       }
     )
 
@@ -153,7 +191,7 @@ export default function Home() {
           </Grid.Col>
           <Grid.Col span={{ base: 12, lg: 6 }}>
             <Paper shadow="xs" p="xl">
-              <form onSubmit={form.onSubmit((values) => buildVcJwt(values.documents, values.neverExpires))}>
+              <form onSubmit={form.onSubmit((values) => buildVcJwt(values))}>
                 <Title order={3} ta="center" mb="lg">
                   Verifiable Presentation Generator
                 </Title>
@@ -175,16 +213,50 @@ export default function Home() {
                     +
                   </Button>
                 </Group>
-                <Group mt="lg">
-                  <Checkbox
-                    defaultChecked
-                    label="Never Expires"
-                    description="Doesn't set a validUntil property"
-                    variant="outline"
-                    key={form.key('neverExpires')}
-                    {...form.getInputProps('neverExpires', { type: 'checkbox' })}
-                  />
-                </Group>
+                <Radio.Group
+                  name="validity"
+                  label="VC/VP Validity"
+                  key={form.key('validity')}
+                  {...form.getInputProps('validity')}
+                >
+                  <Group mt="lg">
+                    <Radio
+                      label="Default"
+                      description="Default value set in the backend"
+                      variant="outline"
+                      value={Validity.DEFAULT}
+                    />
+                  </Group>
+                  <Group mt="lg">
+                    <Radio
+                      label="Override Validity"
+                      description="Overrides the default validUntil property value"
+                      variant="outline"
+                      value={Validity.OVERRIDE}
+                    />
+                    <NumberInput
+                      placeholder="Validity"
+                      min={1}
+                      key={form.key('validityOffset')}
+                      w="100"
+                      {...form.getInputProps('validityOffset')}
+                    />
+                    <Select
+                      data={validityUnits}
+                      key={form.key('validityUnit')}
+                      w="150"
+                      {...form.getInputProps('validityUnit')}
+                    />
+                  </Group>
+                  <Group mt="lg">
+                    <Radio
+                      label="Never Expires"
+                      description="Doesn't set a validUntil property"
+                      variant="outline"
+                      value={Validity.NEVER_EXPIRES}
+                    />
+                  </Group>
+                </Radio.Group>
                 <Group mt="lg" justify="right">
                   <Button type="submit" variant="light">
                     Sign

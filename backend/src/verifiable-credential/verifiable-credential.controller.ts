@@ -1,10 +1,11 @@
-import { Body, Controller, Post, Query } from '@nestjs/common'
+import { BadRequestException, Body, Controller, Post, Query } from '@nestjs/common'
 import { SigningService } from './signing.service'
 import VerifiableCredential from '../model/verifiable-credential'
 import { VpJwt } from '../model/vp-jwt'
 import { VcJwt } from '../model/vc-jwt'
 import VerifiablePresentation from '../model/verifiable-presentation'
 import EnvelopedVerifiableCredential from '../model/enveloped-verifiable-credential'
+import { DateTime } from 'luxon'
 
 @Controller('verifiable-credentials')
 export class VerifiableCredentialController {
@@ -13,12 +14,20 @@ export class VerifiableCredentialController {
   @Post()
   async buildVerifiablePresentation(
     @Body() documents: VerifiableCredential[],
-    @Query('neverExpires') neverExpiresString?: string
+    @Query('neverExpires') neverExpiresString?: string,
+    @Query('validUntil') validUntilString?: string
   ): Promise<VpJwt> {
-    const neverExpires = neverExpiresString == 'true' || neverExpiresString == '1'
+    const neverExpires: boolean = neverExpiresString == 'true' || neverExpiresString == '1'
+
+    const validUntil: DateTime = validUntilString ? DateTime.fromISO(validUntilString) : null
+    if (validUntil?.invalidReason) {
+      throw new BadRequestException(validUntil.invalidReason, validUntil.invalidExplanation)
+    }
+
     const vcJwts: VcJwt[] = await Promise.all(
       documents.map(
-        async (document: any): Promise<string> => await this.signingService.signDocument(document, neverExpires)
+        async (document: any): Promise<string> =>
+          await this.signingService.signDocument(document, neverExpires, validUntil)
       )
     )
 
@@ -34,6 +43,6 @@ export class VerifiableCredentialController {
       )
     }
 
-    return await this.signingService.signDocument(verifiablePresentation, neverExpires)
+    return await this.signingService.signDocument(verifiablePresentation, neverExpires, validUntil)
   }
 }

@@ -14,7 +14,8 @@ export class SigningService {
 
   async signDocument(
     document: VerifiableCredential | VerifiablePresentation,
-    neverExpires: boolean
+    neverExpires: boolean,
+    validUntil: DateTime | null
   ): Promise<VcJwt | VpJwt> {
     const didWeb: string = `did:web:${this.configService.get('DOMAIN', 'domain.com')}`
     const privateKey: KeyLike = await importPKCS8(
@@ -27,6 +28,8 @@ export class SigningService {
 
     if (neverExpires) {
       delete document.validUntil
+    } else if (validUntil) {
+      document.validUntil = validUntil.toISO()
     } else {
       document.validUntil = DateTime.now()
         .plus({ days: this.configService.get<number>('EXPIRATION_DAYS', 1) })
