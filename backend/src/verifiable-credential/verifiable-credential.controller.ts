@@ -37,7 +37,7 @@ export class VerifiableCredentialController {
       verifiableCredential: vcJwts.map(
         (vcJwt: VcJwt): EnvelopedVerifiableCredential => ({
           '@context': 'https://www.w3.org/ns/credentials/v2',
-          id: `data:application/vc+ld+json+jwt;${vcJwt}`,
+          id: `data:application/vc+ld+json+jwt,${vcJwt}`,
           type: 'EnvelopedVerifiableCredential'
         })
       )

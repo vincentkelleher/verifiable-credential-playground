@@ -85,7 +85,7 @@ export default function Home() {
     for (const verifiableCredential of verifiableCredentials) {
       if (verifiableCredential.type?.includes('EnvelopedVerifiableCredential')) {
         const vcJwt: VcJwt = (verifiableCredential.id ?? verifiableCredential['@id']!).replace(
-          'data:application/vc+ld+json+jwt;',
+          'data:application/vc+ld+json+jwt,',
           ''
         )
         form.insertListItem('documents', JSON.stringify(decodeJwt(vcJwt), null, 2))
