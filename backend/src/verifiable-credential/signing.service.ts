@@ -39,8 +39,8 @@ export class SigningService {
     return await new CompactSign(new TextEncoder().encode(JSON.stringify(document)))
       .setProtectedHeader({
         alg: `${this.configService.get('PRIVATE_KEY_ALGORITHM', 'ES256')}`,
-        typ: 'vc+ld+json+jwt',
-        cty: 'vc+ld+json',
+        typ: 'credentialSubject' in document ? 'vc+jwt' : 'vp+jwt',
+        cty: 'credentialSubject' in document ? 'vc' : 'vp',
         iss: didWeb,
         kid: didWeb + '#X509-JWK2020'
       })
