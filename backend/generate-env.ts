@@ -21,7 +21,8 @@ const generate = async () => {
 PRIVATE_KEY="${privateKeyPem.trim()}"
 PRIVATE_KEY_ALGORITHM="ES256"
 PUBLIC_KEY="${publicKeyPem.trim()}"
-CERTIFICATE=""`
+CERTIFICATE=""
+JWKS_KEY_NAME="X509-JWK2020"`
   )
 
   console.log('👉 Default environment file: ./env')
