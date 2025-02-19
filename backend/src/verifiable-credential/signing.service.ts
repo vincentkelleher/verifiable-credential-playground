@@ -42,7 +42,7 @@ export class SigningService {
         typ: 'credentialSubject' in document ? 'vc+jwt' : 'vp+jwt',
         cty: 'credentialSubject' in document ? 'vc' : 'vp',
         iss: didWeb,
-        kid: didWeb + '#X509-JWK2020'
+        kid: `${didWeb}#${this.configService.get('JWKS_KEY_NAME', 'X509-JWK2020')}`
       })
       .sign(privateKey)
   }

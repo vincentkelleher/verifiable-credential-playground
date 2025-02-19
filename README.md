@@ -86,6 +86,7 @@ Each main component has environment variables that allow you to customize your p
 | PRIVATE_KEY_ALGORITHM | ES256                                                    | Private key signing algorithm                                                                                                               |
 | PUBLIC_KEY            | *Random generated value see [Run Locally](#run-locally)* | Public key derived from the signing private key referenced by the *PRIVATE_KEY* environment variable, this is also used in the DID document |
 | CERTIFICATE           | *Random generated value see [Run Locally](#run-locally)* | Certificate used in the `x5u` attribute of the DID document to give more information about the owner of the DID                             |
+| JWKS_KEY_NAME         | X509-JWK2020                                             | ID of the assertionMethod in the DID Document. Also referred in the signed VCs and VPs                                                      |
 
 
 ## Deploying
