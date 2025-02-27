@@ -57,6 +57,11 @@ frontend:
     #   readOnly: true
 
 backend:
+  image:
+    repository: ghcr.io/vincentkelleher/verifiable-credential-playground-backend
+    tag: latest
+    pullPolicy: Always
+
   securityContext: {}
 
   # Below is ignored if useLetsEncryptCertificate is true
