@@ -1,0 +1,124 @@
+replicaCount: 1
+
+useLetsEncryptCertificate: true
+defaultCredentialExpiration: 90
+
+initContainers: []
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+podAnnotations: {}
+podLabels: {}
+
+podSecurityContext: {}
+
+service:
+  type: ClusterIP
+
+frontend:
+  image:
+    repository: ghcr.io/vincentkelleher/verifiable-credential-playground-frontend
+    tag: latest
+    pullPolicy: Always
+
+  port: 3000
+
+  securityContext: {}
+  resources:
+    requests:
+      memory: "200Mi"
+      cpu: "100m"
+    limits:
+      memory: "600Mi"
+      cpu: "500m"
+
+  livenessProbe:
+    httpGet:
+      path: /playground
+      port: http
+      initialDelaySeconds: 5
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 10
+  readinessProbe:
+    httpGet:
+      path: /playground
+      port: http
+      initialDelaySeconds: 5
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 10
+
+  volumeMounts: [ ]
+    # - name: foo
+    #   mountPath: "/etc/foo"
+    #   readOnly: true
+
+backend:
+  securityContext: {}
+
+  # Below is ignored if useLetsEncryptCertificate is true
+  # certificate: X509 certificate chain
+  privateKeyAlgorithm: RS256
+
+  port: 4000
+
+  resources:
+    requests:
+      memory: "100Mi"
+      cpu: "100m"
+    limits:
+      memory: "300Mi"
+      cpu: "400m"
+
+  livenessProbe:
+    httpGet:
+      path: /.well-known/did.json
+      port: http
+      initialDelaySeconds: 5
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 10
+  readinessProbe:
+    httpGet:
+      path: /.well-known/did.json
+      port: http
+      initialDelaySeconds: 5
+      timeoutSeconds: 5
+      periodSeconds: 10
+      failureThreshold: 10
+
+  volumeMounts: []
+    # - name: foo
+    #   mountPath: "/etc/foo"
+    #   readOnly: true
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: "vc-jwt.io"
+      path: /
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+
+
+volumes: []
+# - name: foo
+#   secret:
+#     secretName: mysecret
+#     optional: false
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
