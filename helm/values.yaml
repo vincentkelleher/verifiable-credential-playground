@@ -37,19 +37,19 @@ frontend:
   livenessProbe:
     httpGet:
       path: /playground
-      port: http
-      initialDelaySeconds: 5
-      timeoutSeconds: 5
-      periodSeconds: 10
-      failureThreshold: 10
+      port: 3000
+    initialDelaySeconds: 5
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 10
   readinessProbe:
     httpGet:
       path: /playground
-      port: http
-      initialDelaySeconds: 5
-      timeoutSeconds: 5
-      periodSeconds: 10
-      failureThreshold: 10
+      port: 3000
+    initialDelaySeconds: 5
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 10
 
   volumeMounts: [ ]
     # - name: foo
@@ -76,19 +76,19 @@ backend:
   livenessProbe:
     httpGet:
       path: /.well-known/did.json
-      port: http
-      initialDelaySeconds: 5
-      timeoutSeconds: 5
-      periodSeconds: 10
-      failureThreshold: 10
+      port: 4000
+    initialDelaySeconds: 5
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 10
   readinessProbe:
     httpGet:
       path: /.well-known/did.json
-      port: http
-      initialDelaySeconds: 5
-      timeoutSeconds: 5
-      periodSeconds: 10
-      failureThreshold: 10
+      port: 4000
+    initialDelaySeconds: 5
+    timeoutSeconds: 5
+    periodSeconds: 10
+    failureThreshold: 10
 
   volumeMounts: []
     # - name: foo
@@ -104,12 +104,10 @@ ingress:
   hosts:
     - host: "vc-jwt.io"
       path: /
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
-
-
+  tls:
+    - secretName: vc-jwt-io-tls
+      hosts:
+        - vc-jwt.io
 
 volumes: []
 # - name: foo
