@@ -35,7 +35,7 @@ spec:
       initContainers:
         - name: {{printf "init-%s-backend" .Chart.Name }}
           image: alpine/openssl:latest
-          command: [ 'sh', '-c', 'openssl rsa -in /cert-manager/tls.key -pubout > /keys/public-key.pem && openssl pkcs8 -topk8 -inform PEM -in /cert-manager/tls.key -out /keys/private-key.key -nocrypt && wget -O /tmp/ca.root https://letsencrypt.org/certs/isrgrootx1.pem && cat /cert-manager/tls.crt /tmp/ca.root > /keys/chain.crt' ]
+          command: [ 'sh', '-c', 'until [ -e /cert-manager/tls.key ]; do sleep 5; echo Sleeping for 5 seconds, waiting for cert-manager to finish the certificate negociation; done && openssl rsa -in /cert-manager/tls.key -pubout > /keys/public-key.pem && openssl pkcs8 -topk8 -inform PEM -in /cert-manager/tls.key -out /keys/private-key.key -nocrypt && wget -O /tmp/ca.root https://letsencrypt.org/certs/isrgrootx1.pem && cat /cert-manager/tls.crt /tmp/ca.root > /keys/chain.crt' ]
           volumeMounts:
             - name: key-volume
               mountPath: "/keys"
