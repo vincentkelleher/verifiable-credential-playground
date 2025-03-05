@@ -107,3 +107,24 @@ linked to the root URL for DID resolving purposes. The frontend container is map
 > 
 > Also, if you are using `cert-manager` you can use an init container to derive the public key from the certificate's 
 > secret private key to then inject it as a backend environment variable.
+
+#### Using Helm
+
+To make the deployment task easier, a Helm chart has been provided in the [`helm/` folder](helm).
+
+We recommend deploying this application via [ArgoCD](https://github.com/argoproj/argo-cd) but the vanilla Helm CLI is 
+sufficient to get things running.
+
+##### Variables
+
+Please checkout the [`helm/values.yaml` file](helm/values.yaml) to find which variables you can customize for your 
+deployment. The usual variables produced by the `helm create` command are available but some specific ones exist as 
+described in the table below, modifying those is sufficient to get the application running.
+
+| Variable                    | Default Value                                   | Description                                                                                                                                                                         |
+|-----------------------------|-------------------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| useLetsEncryptCertificate   | true                                            | If you are using `cert-manager` and Let's Encrypt, you can set this variable to `true`, this will take care of setting up the private key, public key and certificate automatically |
+| defaultCredentialExpiration | 90                                              | Number of days before the certificate expires                                                                                                                                       |
+| backend.privateKeyAlgorithm | RS256                                           | Algorithm of the private key used to sign verifiable credentials                                                                                                                    |
+| ingress.hosts               | see [`helm/values.yaml` file](helm/values.yaml) | Ingress hosts for the application                                                                                                                                                   |
+| ingress.tls                 | see [`helm/values.yaml` file](helm/values.yaml) | TLS configuration for the application ingress                                                                                                                                       |
