@@ -1,5 +1,7 @@
 # 🛝 Verifiable Credential Playground
 
+**⚠️ This project is now part of the Gaia-X Community repository and has been moved to https://gitlab.com/gaia-x/gaia-x-community/vc-jwt.io.**
+
 > A minimalistic verifiable credential utility application designed to sign VC-JWTs and expose a basic
 > DID document based on Gaia-X standards.
 
